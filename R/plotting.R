@@ -1491,12 +1491,12 @@ JackStrawPlot <- function(
   plot.x.lim = 0.1,
   plot.y.lim = 0.3
 ) {
-
+  
   pAll <- GetDimReduction(object,reduction.type = "pca", slot = "jackstraw")@emperical.p.value
   pAll <- pAll[, PCs, drop = FALSE]
   pAll <- as.data.frame(pAll)
   pAll$Contig <- rownames(x = pAll)
-  pAll.l <- melt(data = pAll, id.vars = "Contig")
+  pAll.l <- reshape2::melt(data = pAll, id.vars = "Contig")
   colnames(x = pAll.l) <- c("Contig", "PC", "Value")
   qq.df <- NULL
   score.df <- NULL
@@ -1532,6 +1532,10 @@ JackStrawPlot <- function(
   pAll.l$PC.Score <- factor(
     x = pAll.l$PC.Score,
     levels = paste0(score.df$PC, " ", sprintf("%1.3g", score.df$Score))
+  )
+  pAll.l$p.val <- rep(
+    x = score.df$Score,
+    each = length(x = unique(x = pAll.l$Contig))
   )
   gp <- ggplot(data = pAll.l, mapping = aes(sample=Value)) +
     stat_qq(distribution = qunif) +
